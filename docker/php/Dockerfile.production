@@ -1,0 +1,124 @@
+# Laravel Production Docker Image
+# Multi-stage build for optimization
+
+# Build Stage - Node.js for assets
+FROM node:18-alpine AS node-builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY vite.config.js ./
+COPY tailwind.config.js ./
+COPY postcss.config.js ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy source files
+COPY resources/ resources/
+COPY public/ public/
+
+# Build assets
+RUN npm run build
+
+# Production Stage - PHP
+FROM php:8.2-fpm-alpine
+
+# Install system dependencies
+RUN apk add --no-cache \
+    postgresql-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libzip-dev \
+    icu-dev \
+    oniguruma-dev \
+    supervisor \
+    curl \
+    zip \
+    unzip \
+    git \
+    redis \
+    nginx
+
+# Install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+        pdo \
+        pdo_pgsql \
+        gd \
+        zip \
+        intl \
+        mbstring \
+        pcntl \
+        bcmath \
+        opcache
+
+# Install Redis extension
+RUN pecl install redis && docker-php-ext-enable redis
+
+# Install APCu for user cache
+RUN pecl install apcu && docker-php-ext-enable apcu
+
+# Install Composer
+COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+
+# Create application user
+RUN addgroup -g 1000 -S www && \
+    adduser -u 1000 -S www -G www
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy Composer files
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+
+# Copy application code
+COPY . .
+
+# Copy built assets from Node.js stage
+COPY --from=node-builder /app/public/build ./public/build
+
+# Set correct permissions
+RUN chown -R www:www /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
+
+# Laravel optimization commands
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache \
+    && php artisan event:cache
+
+# Copy production configurations
+COPY docker/php/production/php.ini /usr/local/etc/php/conf.d/99-production.ini
+COPY docker/php/production/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+COPY docker/php/production/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+# Copy supervisor configuration
+COPY docker/php/production/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Copy entrypoint script
+COPY docker/php/production/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD php artisan config:cache || exit 1
+
+# Expose port
+EXPOSE 9000
+
+# Switch to non-root user
+USER www
+
+# Set entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+# Default command
+CMD ["php-fpm"]

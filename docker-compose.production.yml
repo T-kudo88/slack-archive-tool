@@ -1,0 +1,260 @@
+
+services:
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: slack_archive_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/production:/etc/nginx/conf.d
+      - ./storage/app/public:/var/www/html/storage:ro
+      - ./public:/var/www/html/public:ro
+      - ./docker/ssl:/etc/ssl/certs:ro
+      - nginx_cache:/var/cache/nginx
+    depends_on:
+      - php
+    networks:
+      - slack_archive_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # Laravel PHP-FPM Application
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.production
+    container_name: slack_archive_php
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/production/php.ini:/usr/local/etc/php/php.ini:ro
+      - ./docker/php/production/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+      - storage_volume:/var/www/html/storage
+      - bootstrap_cache:/var/www/html/bootstrap/cache
+    environment:
+      - CONTAINER_ROLE=app
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - slack_archive_network
+    healthcheck:
+      test: ["CMD", "php", "artisan", "config:cache"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # Laravel Queue Worker
+  queue:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.production
+    container_name: slack_archive_queue
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/production/php.ini:/usr/local/etc/php/php.ini:ro
+      - storage_volume:/var/www/html/storage
+      - bootstrap_cache:/var/www/html/bootstrap/cache
+    environment:
+      - CONTAINER_ROLE=queue
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600 --memory=512
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - slack_archive_network
+    healthcheck:
+      test: ["CMD", "ps", "aux", "|", "grep", "[q]ueue:work"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # Laravel Scheduler
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.production
+    container_name: slack_archive_scheduler
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/production/php.ini:/usr/local/etc/php/php.ini:ro
+      - storage_volume:/var/www/html/storage
+      - bootstrap_cache:/var/www/html/bootstrap/cache
+    environment:
+      - CONTAINER_ROLE=scheduler
+    command: /bin/sh -c "while true; do php artisan schedule:run; sleep 60; done"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - slack_archive_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: slack_archive_postgres
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-slack_archive}
+      POSTGRES_USER: ${DB_USERNAME:-slack_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=ja_JP.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/production/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./docker/postgres/production/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - ./docker/postgres/initdb:/docker-entrypoint-initdb.d:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - slack_archive_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-slack_user} -d ${DB_DATABASE:-slack_archive}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # Redis Cache & Session Storage
+  redis:
+    image: redis:7-alpine
+    container_name: slack_archive_redis
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/production/redis.conf:/etc/redis/redis.conf:ro
+    sysctls:
+      net.core.somaxconn: 1024
+    networks:
+      - slack_archive_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # PostgreSQL Backup Service
+  postgres_backup:
+    image: postgres:16-alpine
+    container_name: slack_archive_backup
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-slack_archive}
+      POSTGRES_USER: ${DB_USERNAME:-slack_user}
+      PGPASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_backups:/backups
+      - ./docker/postgres/backup:/scripts:ro
+    command: /scripts/backup.sh
+    depends_on:
+      - postgres
+    networks:
+      - slack_archive_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # Log Rotation Service
+  logrotate:
+    image: alpine:latest
+    container_name: slack_archive_logrotate
+    restart: unless-stopped
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./docker/logrotate/logrotate.conf:/etc/logrotate.conf:ro
+    command: /bin/sh -c "while true; do logrotate -f /etc/logrotate.conf; sleep 86400; done"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  slack_archive_network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: slack_archive_br0
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/slack-archive/data/postgres
+
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/slack-archive/data/redis
+
+  storage_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/slack-archive/storage
+
+  bootstrap_cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/slack-archive/bootstrap/cache
+
+  postgres_backups:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/slack-archive/backups
+
+  nginx_cache:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/slack-archive/cache/nginx

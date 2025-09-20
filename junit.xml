@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\FileStorageTest" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" tests="11" assertions="0" errors="11" failures="0" skipped="0" time="0.000000">
+    <testcase name="test_file_upload_endpoint" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="34" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_file_upload_endpoint
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Ms. Adele Conroy, alda01@example.org, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, lUaaJxcrQx, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+    <testcase name="test_file_download_requires_authentication" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="64" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_file_download_requires_authentication
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Prof. Kris Abernathy DVM, emie35@example.net, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, EWIDV2x5xC, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+    <testcase name="test_public_file_access" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="85" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_public_file_access
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Morton Treutel Jr., aliyah21@example.com, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, Bi4aQ478f8, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+    <testcase name="test_file_access_control" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="100" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_file_access_control
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Lurline Strosin IV, buckridge.janis@example.org, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, zmq9VKzW5x, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+    <testcase name="test_admin_can_access_all_files" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="116" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_admin_can_access_all_files
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Shayna Littel, armstrong.charley@example.net, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, ubnRbYKJRs, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+    <testcase name="test_file_thumbnail_generation" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="133" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_file_thumbnail_generation
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Prof. Delores Legros, mose.pfeffer@example.com, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, Zowh2XPOEL, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+    <testcase name="test_file_bulk_delete" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="159" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_file_bulk_delete
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Edison Hills, lillie54@example.org, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, NbrCgBGbbM, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+    <testcase name="test_file_statistics" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="185" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_file_statistics
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Prof. Vinnie DuBuque II, jacques.kreiger@example.net, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, Hd8tzZr6CD, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+    <testcase name="test_file_validation" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="210" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_file_validation
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Lorenza Grimes PhD, gbeahan@example.org, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, 1ZOzBT3NIK, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+    <testcase name="test_signed_url_generation" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="235" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_signed_url_generation
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Lamont Dickens, bartoletti.nyasia@example.net, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, TDED8RYjnV, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+    <testcase name="test_file_search_and_filtering" file="/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php" line="265" class="Tests\Feature\FileStorageTest" classname="Tests.Feature.FileStorageTest" assertions="0" time="0.000000">
+      <error type="Illuminate\Database\QueryException">Tests\Feature\FileStorageTest::test_file_search_and_filtering
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "remember_token", "slack_user_id", "avatar_url", "is_admin", "is_active", "access_token", "refresh_token", "token_expires_at", "last_login_at", "role", "updated_at", "created_at") values (Randall Bruen, collins.julien@example.com, 2025-09-05 09:42:59, $2y$04$1zka3AGAQJCEj/0tmd016OoebnXWV0xSiOEtuCYmO9JZdPcNn7a2e, q6ctGilMRZ, ?, ?, 0, 1, ?, ?, ?, ?, user, 2025-09-05 09:42:59, 2025-09-05 09:42:59))
+
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:824
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:778
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:559
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Connection.php:523
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/Processor.php:32
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3853
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2220
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1434
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1399
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1238
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:367
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php:271
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:362
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:318
+/Users/kudoutatsuya/slack-archive/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Factories/Factory.php:312
+/Users/kudoutatsuya/slack-archive/tests/Feature/FileStorageTest.php:26</error>
+    </testcase>
+  </testsuite>
+</testsuites>
