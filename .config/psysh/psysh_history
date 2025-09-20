@@ -1,0 +1,25 @@
+env('SLACK_USER_TOKEN');
+exit
+env('SLACK_USER_TOKEN');
+exit
+config('services.slack.user_token');
+env('SLACK_USER_TOKEN');
+exit
+config('services.slack.user_token');
+env('SLACK_USER_TOKEN');env('SLACK_USER_TOKEN');
+exit
+config('services.slack.user_token');
+env('SLACK_USER_TOKEN');
+config('services.slack.user_token');
+$msg = App\Models\Message::latest()->first();
+$msg->files;   // 添付ファイル
+$msg->reactions; // 配列として取得できる
+$msg = App\Models\Message::latest()->first();
+$msg->files;      // 紐付くファイル（ある場合）
+$msg->reactions;  // 配列 or null
+$msg->toArray();  // 全体像を確認
+App\Models\Message::count();
+exit
+App\Models\User::first();
+exiyt
+exit

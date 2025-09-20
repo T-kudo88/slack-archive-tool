@@ -1,0 +1,83 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 8
+    paths:
+        - app/
+        - config/
+        - routes/
+        - database/migrations/
+        - database/seeders/
+        - database/factories/
+    
+    excludePaths:
+        - app/Http/Middleware/Authenticate.php
+        - app/Http/Middleware/RedirectIfAuthenticated.php
+        - app/Http/Middleware/TrustHosts.php
+        - app/Http/Middleware/TrustProxies.php
+        - app/Http/Middleware/ValidateSignature.php
+        - app/Http/Middleware/VerifyCsrfToken.php
+        - bootstrap/
+        - storage/
+        - vendor/
+        - node_modules/
+    
+    ignoreErrors:
+        # Allow Eloquent magic methods
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\(Builder|Collection)#'
+        - '#Access to an undefined property Illuminate\\Database\\Eloquent\\(Model|Builder)#'
+        
+        # Allow Laravel facade usage
+        - '#Call to an undefined static method Illuminate\\Support\\Facades\\[a-zA-Z]+::#'
+        
+        # Allow Inertia response
+        - '#Method [a-zA-Z\\]+::inertia\(\) should return Inertia\\Response but returns Illuminate\\Http\\Response#'
+        
+        # Allow Laravel helper functions
+        - '#Function (route|config|app|auth|request|response|session|cache|view|trans|__) not found#'
+        
+        # Allow Laravel request validation
+        - '#Call to an undefined method Illuminate\\Http\\Request::(validate|validated)#'
+        
+        # Allow Carbon datetime operations
+        - '#Call to an undefined method Carbon\\Carbon::#'
+        
+        # Ignore some Laravel internal complexity
+        - '#Parameter .* of method .* expects .*, Illuminate\\Database\\Eloquent\\Model given#'
+        
+    reportUnmatchedIgnoredErrors: false
+    
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    
+    earlyTerminatingMethodCalls:
+        App\Exceptions\Handler:
+            - abort
+            - dd
+            - dump
+    
+    stubFiles:
+        - stubs/User.stub
+        - stubs/Model.stub
+    
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    
+    scanFiles:
+        - app/helpers.php
+    
+    scanDirectories:
+        - app/
+    
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    checkUninitializedProperties: true
+    checkImplicitMixed: false
+    checkBenevolentUnionTypes: false
+    checkMissingVarTagTypehint: true
+    
+    universalObjectCratesClasses:
+        - Illuminate\Http\Request
+        - Illuminate\Database\Eloquent\Model
+        - Illuminate\Support\Collection
+        - Illuminate\Database\Eloquent\Collection

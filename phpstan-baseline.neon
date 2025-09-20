@@ -1,0 +1,4 @@
+parameters:
+    ignoreErrors:
+        # Generated baseline file - add specific ignore patterns as needed
+        # This file will be populated by running: vendor/bin/phpstan analyse --generate-baseline
