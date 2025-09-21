@@ -49,6 +49,7 @@ Route::middleware('flexible.auth')->group(function () {
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/search', [MessageController::class, 'search'])->name('messages.search');
     Route::get('/messages/stats', [MessageController::class, 'stats'])->name('messages.stats');
+    Route::get('/messages/{message}/thread', [MessageController::class, 'thread'])->name('messages.thread');
 
     Route::middleware('personal.data.restriction')->group(function () {
         Route::post('/messages/export', [MessageController::class, 'export'])->name('messages.export');

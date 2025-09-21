@@ -63,6 +63,15 @@ class MessageController extends Controller
 
         $query = $this->buildAccessibleMessagesQuery($user);
 
+        // ========================
+        // 親メッセージのみを取得
+        // ========================
+        // 親メッセージのみを取得
+        $query->where(function ($q) {
+            $q->whereNull('thread_ts')  // スレッドでないメッセージ
+                ->orWhereRaw('thread_ts::numeric = timestamp'); // thread_ts と timestamp が一致（親）
+        });
+
         if ($workspaceId) {
             $query->where('messages.workspace_id', $workspaceId);
         }
@@ -87,14 +96,8 @@ class MessageController extends Controller
             ->limit($limit)
             ->get();
 
-        \Log::info('Fetched messages', [
-            'count' => $messages->count(),
-            'sample' => $messages->take(5)->toArray(),
-        ]);
-
         // 日付ごとにグルーピング
         $grouped = $messages->groupBy(function ($msg) {
-            // Slackのtimestampは "1754804994.729649" 形式なので整数部だけ取る
             $ts = (int) floor($msg->timestamp);
             return \Carbon\Carbon::createFromTimestamp($ts)->format('Y-m-d');
         })->map(function ($msgs, $date) {
@@ -103,10 +106,6 @@ class MessageController extends Controller
                 'messages' => $msgs,
             ];
         })->values();
-
-        \Log::info('Inertia render data', [
-            'groupedMessages' => $grouped->toArray(),
-        ]);
 
         return Inertia::render('Messages/Index', [
             'groupedMessages' => $grouped->toArray(),
@@ -202,6 +201,22 @@ class MessageController extends Controller
                 'is_private' => $message->channel->is_private,
                 'is_dm' => $message->channel->is_dm,
             ]
+        ]);
+    }
+
+    public function thread(Message $message): \Illuminate\Http\JsonResponse
+    {
+        $replies = Message::where('thread_ts', $message->thread_ts)
+            ->where('id', '!=', $message->id)
+            ->with(['user', 'files'])
+            ->orderBy('timestamp', 'asc')
+            ->get();
+
+        return response()->json([
+            'parent'  => $message->load(['user', 'files']),
+            'replies' => $replies,
+            'channel' => $message->channel,
+            'workspace' => $message->workspace,
         ]);
     }
 

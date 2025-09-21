@@ -5,6 +5,7 @@ import SearchForm from '@/Components/Messages/SearchForm';
 import UserSelector from '@/Components/Messages/UserSelector';
 import PersonalDataBadge, { PersonalDataInfo } from '@/Components/Messages/PersonalDataBadge';
 import FileAttachment from '@/Components/Messages/FileAttachment';
+import ThreadView from '@/Components/Messages/ThreadView';
 import { PageProps, User, Workspace, Channel } from '@/types';
 
 interface FileAttachmentData {
@@ -29,7 +30,7 @@ interface Message {
     user: User;
     channel: Channel;
     workspace?: Workspace;
-    files?: FileAttachmentData[]; // ← 追加
+    files?: FileAttachmentData[];
 }
 
 interface GroupedMessage {
@@ -65,6 +66,29 @@ export default function Index({ auth, groupedMessages, filters, filterOptions, s
     const [showPersonalDataInfo, setShowPersonalDataInfo] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+
+    // スレッド表示用の state
+    const [threadData, setThreadData] = useState<{
+        parent: Message | null;
+        replies: Message[];
+        channel: Channel | null;
+        workspace?: Workspace | null;
+    } | null>(null);
+    
+    const openThread = async (msg: Message) => {
+        try {
+            const res = await fetch(`/messages/${msg.id}/thread`);
+            const data = await res.json();
+            setThreadData({
+                parent: data.parent,
+                replies: data.replies,
+                channel: data.channel,
+                workspace: data.workspace,
+            });
+        } catch (err) {
+            console.error("Failed to fetch thread:", err);
+        }
+    };
 
     const completeStats = {
         total_channels: filterOptions.channels.length,
@@ -103,8 +127,6 @@ export default function Index({ auth, groupedMessages, filters, filterOptions, s
         return parts.join(' | ');
     };
 
-    console.log("groupedMessages from Inertia:", groupedMessages);
-
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -138,36 +160,35 @@ export default function Index({ auth, groupedMessages, filters, filterOptions, s
             <Head title={getPageTitle()} />
 
             <div className="py-6">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 flex">
+                    
+                    {/* 左側: メッセージ一覧 */}
+                    <div className={`flex-1 bg-gray-50 rounded-lg p-6 ${threadData ? 'w-2/3' : 'w-full'}`}>
+                        {auth.user.is_admin && (
+                            <UserSelector
+                                currentUser={auth.user}
+                                selectedUserId={selectedUserId}
+                                onUserChange={handleUserChange}
+                                users={[]}
+                                isLoading={isLoading}
+                                className="mb-6"
+                            />
+                        )}
 
-                    {auth.user.is_admin && (
-                        <UserSelector
-                            currentUser={auth.user}
-                            selectedUserId={selectedUserId}
-                            onUserChange={handleUserChange}
-                            users={[]}
+                        {showPersonalDataInfo && (
+                            <PersonalDataInfo
+                                currentUser={auth.user}
+                                stats={completeStats}
+                                className="mb-6"
+                            />
+                        )}
+
+                        <SearchForm
+                            initialFilters={filters}
+                            filterOptions={filterOptions}
                             isLoading={isLoading}
-                            className="mb-6"
                         />
-                    )}
 
-                    {showPersonalDataInfo && (
-                        <PersonalDataInfo
-                            currentUser={auth.user}
-                            stats={completeStats}
-                            className="mb-6"
-                        />
-                    )}
-
-                    {/* 検索フォーム */}
-                    <SearchForm
-                        initialFilters={filters}
-                        filterOptions={filterOptions}
-                        isLoading={isLoading}
-                    />
-
-                    {/* メッセージリスト */}
-                    <div className="bg-gray-50 rounded-lg p-6">
                         {groupedMessages.length > 0 ? (
                             groupedMessages.map(group => (
                                 <div key={group.date} className="mb-8">
@@ -179,21 +200,19 @@ export default function Index({ auth, groupedMessages, filters, filterOptions, s
                                                     <span className="font-semibold">{msg.user?.name}</span>: {msg.text}
                                                 </p>
 
-                                                {/* 添付ファイル */}
                                                 {msg.files && msg.files.length > 0 && (
                                                     <div className="mt-2">
                                                         <FileAttachment files={msg.files} />
                                                     </div>
                                                 )}
 
-                                                {/* スレッド返信 */}
                                                 {msg.reply_count && msg.reply_count > 0 && (
-                                                    <a
-                                                        href={`/messages/${msg.id}`}
+                                                    <button
+                                                        onClick={() => openThread(msg)}
                                                         className="text-blue-600 text-sm hover:underline mt-1 inline-block"
                                                     >
                                                         {msg.reply_count}件の返信を見る
-                                                    </a>
+                                                    </button>
                                                 )}
                                             </div>
                                         ))}
@@ -208,6 +227,25 @@ export default function Index({ auth, groupedMessages, filters, filterOptions, s
                             </p>
                         )}
                     </div>
+
+                    {/* 右側: スレッドペイン */}
+                    {threadData && (
+                        <div className="w-1/3 border-l bg-white p-4">
+                            <button
+                                onClick={() => setThreadData(null)}
+                                className="text-gray-500 hover:text-gray-800 float-right"
+                            >
+                                ✕
+                            </button>
+                            <ThreadView
+                                parentMessage={threadData.parent}
+                                threadReplies={threadData.replies}
+                                channel={threadData.channel}
+                                workspace={threadData.workspace}
+                                currentUser={auth.user}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>
