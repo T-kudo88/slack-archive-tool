@@ -47,3 +47,12 @@ Http::withToken(env('SLACK_BOT_TOKEN'))
     'name' => 'Default Workspace',
 ]);
 exit
+\App\Models\Message::truncate();
+\App\Models\Message::truncate();
+\App\Models\SlackFile::truncate();
+exit
+\App\Models\Message::truncate();
+\App\Models\SlackFile::truncate();
+exit
+\App\Models\Message::truncate();
+exit

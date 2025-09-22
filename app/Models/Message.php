@@ -44,7 +44,7 @@ class Message extends Model
     // リレーション: メッセージはユーザーに属する
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'slack_user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
         // 「メッセージは1人のユーザーに属する」
     }
 

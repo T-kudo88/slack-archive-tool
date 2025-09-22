@@ -83,16 +83,39 @@ class SlackSync extends Command
     {
         $user = isset($msg['user']) ? User::find($msg['user']) : null;
 
+        // --- type 判定 ---
+        // --- type 判定 ---
+        $type = 'user';
+
+        if (!empty($msg['subtype'])) {
+            if ($msg['subtype'] === 'bot_message') {
+                $type = 'bot';
+            } else {
+                $type = 'system';
+            }
+        } elseif (!empty($msg['bot_id'])) {
+            $type = 'bot';
+        } elseif (empty($msg['user'])) {
+            $type = 'system';
+        }
+
         Message::updateOrCreate(
-            ['slack_message_id' => $msg['ts']],
+            ['slack_message_id' => (string) $msg['ts']],
             [
                 'workspace_id' => 1,
                 'channel_id'   => $channelModel->id,
                 'user_id'      => $user?->id,
-                'text'         => $msg['text'] ?? '',
-                'timestamp'    => $msg['ts'],
+                'text'         => $this->replaceMentions($msg['text'] ?? ''),
+                'timestamp'    => (string) $msg['ts'],
                 'thread_ts'    => $msg['thread_ts'] ?? null,
                 'reply_count'  => $msg['reply_count'] ?? 0,
+                'type'         => $type,
+                'metadata'     => [
+                    'username' => $msg['username'] ?? null,
+                    'subtype'  => $msg['subtype']  ?? null,
+                    'bot_id'   => $msg['bot_id']   ?? null,
+                    'app_id'   => $msg['app_id']   ?? null,
+                ],
             ]
         );
 
@@ -137,5 +160,13 @@ class SlackSync extends Command
 
             $cursor = $replies['response_metadata']['next_cursor'] ?? null;
         } while (!empty($cursor));
+    }
+
+    private function replaceMentions(string $text): string
+    {
+        return preg_replace_callback('/<@([A-Z0-9]+)>/', function ($matches) {
+            $user = \App\Models\User::find($matches[1]);
+            return $user ? '@' . $user->name : $matches[0];
+        }, $text);
     }
 }
