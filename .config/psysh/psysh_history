@@ -23,3 +23,27 @@ exit
 App\Models\User::first();
 exiyt
 exit
+Http::withToken(env('SLACK_USER_TOKEN'))
+    ->get('https://slack.com/api/conversations.list', [
+        'types' => 'public_channel,private_channel,im,mpim',
+        'limit' => 5
+    ])
+    ->json();
+Http::withToken(env('SLACK_BOT_TOKEN'))
+    ->get('https://slack.com/api/conversations.list', [
+        'types' => 'public_channel,private_channel',
+        'limit' => 5
+    ])
+    ->json();
+exit
+Http::withToken(env('SLACK_BOT_TOKEN'))
+    ->get('https://slack.com/api/conversations.list', [
+        'types' => 'public_channel,private_channel',
+        'limit' => 5
+    ])
+    ->json();
+\App\Models\Workspace::create([
+    'id'   => 1,
+    'name' => 'Default Workspace',
+]);
+exit
