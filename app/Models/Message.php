@@ -34,6 +34,7 @@ class Message extends Model
         'slack_message_id' => 'string',
         'timestamp' => 'string',
         'thread_ts' => 'string',
+        'ts_at' => 'datetime',
     ];
     // DBから取り出すときに型変換してくれます。
 

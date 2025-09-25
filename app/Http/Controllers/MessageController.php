@@ -59,17 +59,14 @@ class MessageController extends Controller
         $dateFrom = $request->input('date_from');
         $dateTo = $request->input('date_to');
         $messageType = $request->input('message_type', 'all');
-        $limit = min((int)$request->input('limit', 500), 1000); // 最大1000件
+        $limit = min((int)$request->input('limit', 500), 1000); // 最大1000件まで
 
         $query = $this->buildAccessibleMessagesQuery($user);
 
-        // ========================
-        // 親メッセージのみを取得
-        // ========================
-        // 親メッセージのみを取得
+        // 親メッセージのみ
         $query->where(function ($q) {
-            $q->whereNull('thread_ts')  // スレッドでないメッセージ
-                ->orWhereRaw('thread_ts::numeric = timestamp'); // thread_ts と timestamp が一致（親）
+            $q->whereNull('thread_ts')
+                ->orWhereRaw('CAST(thread_ts AS numeric) = timestamp');
         });
 
         if ($workspaceId) {
@@ -79,24 +76,29 @@ class MessageController extends Controller
             $query->where('messages.channel_id', $channelId);
         }
         if ($search) {
-            $query->where('messages.text', 'LIKE', "%{$search}%");
+            $query->where('messages.text', 'ILIKE', "%{$search}%");
         }
+
         if ($dateFrom) {
-            $query->whereDate('messages.created_at', '>=', $dateFrom);
+            $fromTimestamp = \Carbon\Carbon::parse($dateFrom)->startOfDay()->timestamp;
+            $query->where('messages.timestamp', '>=', $fromTimestamp);
         }
+
         if ($dateTo) {
-            $query->whereDate('messages.created_at', '<=', $dateTo);
+            $toTimestamp = \Carbon\Carbon::parse($dateTo)->endOfDay()->timestamp;
+            $query->where('messages.timestamp', '<=', $toTimestamp);
         }
         if ($messageType !== 'all') {
             $query->where('messages.message_type', $messageType);
         }
 
+        // メッセージ取得
         $messages = $query
             ->orderBy('messages.timestamp', 'asc')
             ->limit($limit)
             ->get();
 
-        // 日付ごとにグルーピング
+        // ✅ 日付ごとにグループ化
         $grouped = $messages->groupBy(function ($msg) {
             $ts = (int) floor($msg->timestamp);
             return \Carbon\Carbon::createFromTimestamp($ts)->format('Y-m-d');
@@ -108,25 +110,25 @@ class MessageController extends Controller
         })->values();
 
         return Inertia::render('Messages/Index', [
-            'groupedMessages' => $grouped->toArray(),
+            'groupedMessages' => $grouped, // ← フロントが使ってる名前
             'filters' => [
                 'workspace_id' => $workspaceId,
-                'channel_id' => $channelId,
-                'search' => $search,
-                'date_from' => $dateFrom,
-                'date_to' => $dateTo,
+                'channel_id'   => $channelId,
+                'search'       => $search,
+                'date_from'    => $dateFrom,
+                'date_to'      => $dateTo,
                 'message_type' => $messageType,
-                'limit' => $limit,
+                'limit'        => $limit,
             ],
             'filterOptions' => [
-                'workspaces' => Workspace::all(['id', 'name']),
-                'channels'   => Channel::all(['id', 'name', 'is_private', 'is_dm']),
+                'workspaces'   => Workspace::all(['id', 'name']),
+                'channels'     => Channel::all(['id', 'name', 'is_private', 'is_dm']),
                 'messageTypes' => ['message', 'file', 'reaction'],
             ],
             'stats' => [
-                'total_messages'     => Message::count(),
-                'today_messages'     => Message::whereDate('created_at', now())->count(),
-                'this_week_messages' => Message::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+                'total_messages'      => Message::count(),
+                'today_messages'      => Message::whereDate('created_at', now())->count(),
+                'this_week_messages'  => Message::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
                 'accessible_channels' => Channel::count(),
             ],
         ]);
