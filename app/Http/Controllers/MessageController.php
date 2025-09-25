@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Carbon\Carbon;
+
 
 class MessageController extends Controller
 {
@@ -53,13 +55,19 @@ class MessageController extends Controller
     {
         $user = Auth::user();
 
-        $workspaceId = $request->input('workspace_id');
-        $channelId = $request->input('channel_id');
-        $search = $request->input('search');
-        $dateFrom = $request->input('date_from');
-        $dateTo = $request->input('date_to');
-        $messageType = $request->input('message_type', 'all');
-        $limit = min((int)$request->input('limit', 500), 1000); // 最大1000件まで
+        // per_page の安全処理
+        $perPage = (int) $request->integer('per_page', 25);
+        if (!in_array($perPage, [25, 50, 100], true)) {
+            $perPage = 25;
+        }
+
+        // 空文字は null 扱いに
+        $workspaceId = $request->filled('workspace_id') ? $request->input('workspace_id') : null;
+        $channelId   = $request->filled('channel_id')   ? $request->input('channel_id')   : null;
+        $search      = $request->filled('search')       ? $request->input('search')       : null;
+        $dateFrom    = $request->filled('date_from')    ? $request->input('date_from')    : null;
+        $dateTo      = $request->filled('date_to')      ? $request->input('date_to')      : null;
+        $messageType = $request->filled('message_type') ? $request->input('message_type') : 'all';
 
         $query = $this->buildAccessibleMessagesQuery($user);
 
@@ -69,16 +77,19 @@ class MessageController extends Controller
                 ->orWhereRaw('CAST(thread_ts AS numeric) = timestamp');
         });
 
-        if ($workspaceId) {
+        if ($workspaceId !== null) {
             $query->where('messages.workspace_id', $workspaceId);
         }
-        if ($channelId) {
+        if ($channelId !== null) {
             $query->where('messages.channel_id', $channelId);
         }
+
+        // 🔎 検索（ILIKE）
         if ($search) {
             $query->where('messages.text', 'ILIKE', "%{$search}%");
         }
 
+        // 🔎 開始日・終了日（Slack の timestamp を使用）
         if ($dateFrom) {
             $fromTimestamp = \Carbon\Carbon::parse($dateFrom)->startOfDay()->timestamp;
             $query->where('messages.timestamp', '>=', $fromTimestamp);
@@ -88,29 +99,28 @@ class MessageController extends Controller
             $toTimestamp = \Carbon\Carbon::parse($dateTo)->endOfDay()->timestamp;
             $query->where('messages.timestamp', '<=', $toTimestamp);
         }
+
         if ($messageType !== 'all') {
             $query->where('messages.message_type', $messageType);
         }
 
-        // メッセージ取得
-        $messages = $query
+        // ページング
+        $paginator = $query
             ->orderBy('messages.timestamp', 'asc')
-            ->limit($limit)
-            ->get();
+            ->paginate($perPage)
+            ->withQueryString();
 
-        // ✅ 日付ごとにグループ化
-        $grouped = $messages->groupBy(function ($msg) {
-            $ts = (int) floor($msg->timestamp);
-            return \Carbon\Carbon::createFromTimestamp($ts)->format('Y-m-d');
-        })->map(function ($msgs, $date) {
-            return [
-                'date' => $date,
-                'messages' => $msgs,
-            ];
-        })->values();
+        // グルーピング
+        $grouped = collect($paginator->items())
+            ->groupBy(function ($msg) {
+                $ts = (int) floor($msg->timestamp);
+                return \Carbon\Carbon::createFromTimestamp($ts)->format('Y-m-d');
+            })
+            ->map(fn($msgs, $date) => ['date' => $date, 'messages' => $msgs->values()])
+            ->values();
 
         return Inertia::render('Messages/Index', [
-            'groupedMessages' => $grouped, // ← フロントが使ってる名前
+            'groupedMessages' => $grouped,
             'filters' => [
                 'workspace_id' => $workspaceId,
                 'channel_id'   => $channelId,
@@ -118,11 +128,19 @@ class MessageController extends Controller
                 'date_from'    => $dateFrom,
                 'date_to'      => $dateTo,
                 'message_type' => $messageType,
-                'limit'        => $limit,
+                'per_page'     => $perPage,
+            ],
+            'pagination' => [
+                'total'        => $paginator->total(),
+                'per_page'     => $paginator->perPage(),
+                'current_page' => $paginator->currentPage(),
+                'last_page'    => $paginator->lastPage(),
+                'from'         => $paginator->firstItem(),
+                'to'           => $paginator->lastItem(),
             ],
             'filterOptions' => [
                 'workspaces'   => Workspace::all(['id', 'name']),
-                'channels'     => Channel::all(['id', 'name', 'is_private', 'is_dm']),
+                'channels'     => Channel::all(['id', 'name', 'is_private', 'is_dm', 'workspace_id']),
                 'messageTypes' => ['message', 'file', 'reaction'],
             ],
             'stats' => [
