@@ -1,1 +1,38 @@
+# Laravel
+/vendor
+/node_modules
+/public/storage
+/storage/*.key
+/storage/logs
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/bootstrap/cache/*
+
+# Environment
 .env
+.env.*.local
+
+# Compiled files
+.phpunit.result.cache
+Homestead.yaml
+Homestead.json
+
+# NPM / Yarn
+npm-debug.log
+yarn-error.log
+.pnp.*
+.pnp.js
+
+# TypeScript
+*.tsbuildinfo
+
+# IDE / Editor
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# OS
+Thumbs.db
