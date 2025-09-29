@@ -38,7 +38,6 @@ class SlackSyncMembers extends Command
         foreach ($channels as $ch) {
             $cid = $ch['id'];
             $isDm = (bool)($ch['is_im'] ?? false);
-            $isMpim = (bool)($ch['is_mpim'] ?? false);
 
             // members API（ページング対応）
             $members = [];
@@ -69,14 +68,18 @@ class SlackSyncMembers extends Command
             // DBへ反映（channel_users ピボット）
             DB::transaction(function () use ($cid, $members) {
                 foreach ($members as $slackUid) {
-                    $user = User::where('slack_user_id', $slackUid)->first();
+                    $user = User::find($slackUid); // ← 直接 Slack User ID が PK
                     if (!$user) {
-                        // ユーザー未同期ならスキップ（先に slack:sync-users を実行しておく前提）
+                        // ユーザー未同期ならスキップ（slack:sync-users が前提）
                         continue;
                     }
                     DB::table('channel_users')->updateOrInsert(
                         ['channel_id' => $cid, 'user_id' => $user->id],
-                        ['joined_at' => now(), 'updated_at' => now(), 'created_at' => now()]
+                        [
+                            'joined_at' => now(),
+                            'updated_at' => now(),
+                            'created_at' => now(),
+                        ]
                     );
                 }
             });

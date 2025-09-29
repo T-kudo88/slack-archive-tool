@@ -12,8 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // 10分ごとに SlackSync 実行
-        $schedule->command('slack:sync-all')->everyTenMinutes();
+        $schedule->command('slack:sync-all')->dailyAt('00:00');
     }
 
     /**

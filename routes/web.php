@@ -97,6 +97,14 @@ Route::prefix('admin')
         Route::get('/health-check', function () {
             return response()->json(['status' => 'ok']);
         })->name('admin.health');
+
+        // 差分同期
+        Route::post('/sync-messages', [AdminSyncController::class, 'syncMessages'])
+            ->name('admin.sync-messages');
+
+        // フル同期
+        Route::post('/sync-all-messages', [AdminSyncController::class, 'syncAllMessages'])
+            ->name('admin.sync-all-messages');
     });
 
 Route::get('/debug-auth', function () {

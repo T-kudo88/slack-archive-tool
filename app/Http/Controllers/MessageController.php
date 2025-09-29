@@ -71,10 +71,11 @@ class MessageController extends Controller
 
         $query = $this->buildAccessibleMessagesQuery($user);
 
-        // 親メッセージのみ
+        // 親メッセージ判定
         $query->where(function ($q) {
-            $q->whereNull('thread_ts')
-                ->orWhereRaw('CAST(thread_ts AS numeric) = timestamp');
+            $q->whereNull('thread_ts')                     // NULL
+                ->orWhere('thread_ts', '=', '')              // 空文字
+                ->orWhereColumn('thread_ts', 'slack_message_id'); // 親（自分自身と同じ）
         });
 
         if ($workspaceId !== null) {
@@ -91,12 +92,12 @@ class MessageController extends Controller
 
         // 🔎 開始日・終了日（Slack の timestamp を使用）
         if ($dateFrom) {
-            $fromTimestamp = \Carbon\Carbon::parse($dateFrom)->startOfDay()->timestamp;
+            $fromTimestamp = Carbon::parse($dateFrom)->startOfDay()->valueOf() / 1000; // ← ms を秒に
             $query->where('messages.timestamp', '>=', $fromTimestamp);
         }
 
         if ($dateTo) {
-            $toTimestamp = \Carbon\Carbon::parse($dateTo)->endOfDay()->timestamp;
+            $toTimestamp = Carbon::parse($dateTo)->endOfDay()->valueOf() / 1000;
             $query->where('messages.timestamp', '<=', $toTimestamp);
         }
 
@@ -118,6 +119,17 @@ class MessageController extends Controller
             })
             ->map(fn($msgs, $date) => ['date' => $date, 'messages' => $msgs->values()])
             ->values();
+
+        // デバッグログ出力
+        Log::info('Paginator total: ' . $paginator->total());
+        Log::info('Paginator items count: ' . count($paginator->items()));
+
+        if ($paginator->firstItem()) {
+            Log::info('First item ts: ' . $paginator->items()[0]->timestamp);
+        }
+        if ($paginator->lastItem()) {
+            Log::info('Last item ts: ' . $paginator->items()[count($paginator->items()) - 1]->timestamp);
+        }
 
         return Inertia::render('Messages/Index', [
             'groupedMessages' => $grouped,
@@ -145,8 +157,14 @@ class MessageController extends Controller
             ],
             'stats' => [
                 'total_messages'      => Message::count(),
-                'today_messages'      => Message::whereDate('created_at', now())->count(),
-                'this_week_messages'  => Message::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+                'today_messages'      => Message::whereBetween('timestamp', [
+                    now()->startOfDay()->timestamp,
+                    now()->endOfDay()->timestamp
+                ])->count(),
+                'this_week_messages'  => Message::whereBetween('timestamp', [
+                    now()->startOfWeek()->timestamp,
+                    now()->endOfWeek()->timestamp
+                ])->count(),
                 'accessible_channels' => Channel::count(),
             ],
         ]);

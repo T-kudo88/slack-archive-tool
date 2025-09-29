@@ -32,11 +32,22 @@ class DashboardController extends Controller
         $securityAlerts = $this->getSecurityAlerts();
         $syncStatus = $this->getSyncStatus();
 
+        // 👇 ここを追加
+        $users = User::select('id', 'name', 'email', 'is_admin', 'last_login_at')
+            ->orderBy('name')
+            ->get();
+
+        $userCount = $users->count();
+        $messageCount = Message::count();
+
         return Inertia::render('Admin/Dashboard', [
             'stats' => $stats,
             'recentActivities' => $recentActivities,
             'securityAlerts' => $securityAlerts,
             'syncStatus' => $syncStatus,
+            'userCount' => $userCount,       // ← ユーザー数
+            'messageCount' => $messageCount, // ← メッセージ数
+            'users' => $users,               // ← ユーザー一覧
         ]);
     }
 
@@ -189,7 +200,8 @@ class DashboardController extends Controller
                 return [
                     'type' => 'message_created',
                     'title' => '新しいメッセージ',
-                    'description' => $message->user->name . ' が #' . $message->channel->name . ' に投稿',
+                    'description' => ($message->user->name ?? '不明なユーザー') .
+                        ' が #' . ($message->channel->name ?? '不明なチャンネル') . ' に投稿',
                     'timestamp' => $message->created_at,
                     'icon' => 'chat',
                     'color' => 'blue'
