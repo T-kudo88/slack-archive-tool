@@ -39,12 +39,13 @@ class SlackSyncUsers extends Command
                 }
 
                 User::updateOrCreate(
-                    ['id' => $member['id']], // ← PKはSlackのuser.id
+                    ['id' => $member['id']], // PKはSlackのuser.id
                     [
-                        'name'       => $member['profile']['real_name'] ?? $member['name'],
-                        'email'      => $member['profile']['email'] ?? null,
-                        'avatar_url' => $member['profile']['image_192'] ?? null,
-                        'is_active'  => !$member['deleted'],
+                        'name'         => $member['profile']['real_name'] ?? $member['name'],
+                        'display_name' => $member['profile']['display_name'] ?? null,
+                        'email'        => $member['profile']['email'] ?? null,
+                        'avatar_url'   => $member['profile']['image_192'] ?? null,
+                        'is_active'    => !$member['deleted'],
                     ]
                 );
                 $count++;

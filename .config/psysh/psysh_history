@@ -56,3 +56,54 @@ exit
 exit
 \App\Models\Message::truncate();
 exit
+DB::table('users')->where('email', 'U07THSEMV1@slack.local')->update(['is_admin' => true]);
+DB::table('users')->where('email', 'apple741run62do@gmail.com')->update(['is_admin' => true]);
+DB::table('users')
+    ->where('email', 'U07THSEMV1@slack.local')
+    ->update(['is_admin' => true]);
+DB::table('users')->where('email', 'U07THSEMV1@slack.local')->first();
+DB::table('users')->pluck('email');
+DB::table('users')
+    ->where('email', 'U07THSEMVE1@slack.local')
+    ->update(['is_admin' => true]);
+config('cache.default');
+え￥exit
+config('cache.default');
+exit
+config('cache.default');
+config('cache.default');
+exit
+config('cache.default');
+exit
+config('cache.default');
+exit
+env('CACHE_DRIVER');
+exit
+config('cache.default');
+exit
+$user = App\Models\User::factory()->create([
+    'name' => 'Admin User',
+    'email' => 'admin@example.com',
+    'password' => bcrypt('password'),
+]);
+// 管理者フラグを付与（マイグレーションで `is_admin` カラムがある場合）
+$user->is_admin = true;
+$user->save();
+$user = App\Models\User::create([
+    'name' => 'Admin User',
+    'email' => 'admin@example.com',
+    'password' => bcrypt('password'),
+    'is_admin' => true,
+    'is_active' => true,
+]);
+exit
+$user = App\Models\User::create([
+    'id' => 'admin-user',
+    'name' => 'Admin User',
+    'email' => 'admin@example.com',
+    'password' => bcrypt('password'),
+    'is_admin' => true,
+    'is_active' => true,
+]);
+App\Models\Message::orderBy('timestamp', 'desc')->limit(5)->get()->toArray();
+App\Models\Message::orderBy('timestamp', 'desc')->first();

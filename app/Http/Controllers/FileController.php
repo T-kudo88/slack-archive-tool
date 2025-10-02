@@ -141,7 +141,7 @@ class FileController extends Controller
             abort(404, 'ファイルURLが存在しません');
         }
 
-        $token = config('services.slack.bot_token'); // ← SLACK_BOT_TOKEN を使う
+        $token = config('services.slack.user_token');
 
         $response = \Illuminate\Support\Facades\Http::withToken($token)->get($url);
 
@@ -180,7 +180,7 @@ class FileController extends Controller
 
         // 3. Slack API fallback
         $url = $file->url_private_download ?? $file->url_private;
-        $token = config('services.slack.bot_token');
+        $token = config('services.slack.user_token');
 
         $response = \Illuminate\Support\Facades\Http::withToken($token)->get($url);
 

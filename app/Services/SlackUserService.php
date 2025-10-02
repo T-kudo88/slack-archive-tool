@@ -35,13 +35,14 @@ class SlackUserService
             'email'      => $email,
             'avatar_url' => $slackUserData['profile']['image_72'] ?? null,
             'is_active'  => true,
-            'is_admin'   => false,
             'updated_at' => Carbon::now(),
         ];
 
         if ($user) {
+            // ⚡ 管理者フラグは既存の値を保持
             $user->update($userData);
         } else {
+            $userData['is_admin']   = false; // 新規ユーザーはデフォルトで一般
             $userData['created_at'] = Carbon::now();
             $user = User::create($userData);
         }

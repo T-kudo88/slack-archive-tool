@@ -8,6 +8,7 @@ use App\Models\Message;
 use App\Models\Channel;
 use App\Models\User;
 use App\Models\SlackFile;
+use Illuminate\Support\Facades\Log;
 
 class SlackSync extends Command
 {
@@ -16,27 +17,63 @@ class SlackSync extends Command
 
     public function handle()
     {
-        $token = env('SLACK_USER_TOKEN');
+        $botToken  = config('services.slack.bot_token');
+        $userToken = config('services.slack.user_token');
 
-        // --- 全チャンネルを取得 ---
-        $response = Http::withToken($token)->get('https://slack.com/api/conversations.list', [
+        // --- 全チャンネルを取得（bot_token 使用） ---
+        $response = Http::withToken($botToken)->get('https://slack.com/api/conversations.list', [
             'types' => 'public_channel,private_channel,im,mpim',
             'limit' => 1000,
         ]);
 
         $channels = $response->json()['channels'] ?? [];
         $this->info("Channels count: " . count($channels));
+        Log::info("[SlackSync] Channels count: " . count($channels));
 
         foreach ($channels as $channel) {
             $this->info("Fetching history for channel {$channel['id']}");
 
             // --- チャンネル保存 ---
+            if ($channel['is_im'] ?? false) {
+                // DM の場合
+                $userId = $channel['user'] ?? null;
+                $userName = null;
+
+                if ($userId) {
+                    $user = User::find($userId);
+                    if ($user) {
+                        $userName = $user->name;
+                    } else {
+                        // API からユーザー情報を取得
+                        $userInfo = Http::withToken($userToken)->get('https://slack.com/api/users.info', [
+                            'user' => $userId,
+                        ])->json();
+
+                        $userName = $userInfo['user']['real_name'] ?? $userInfo['user']['name'] ?? $userId;
+
+                        User::updateOrCreate(
+                            ['id' => $userId],
+                            [
+                                'name'      => $userName,
+                                'email'     => $userId . '@slack.local',
+                                'is_active' => true,
+                                'is_admin'  => false,
+                            ]
+                        );
+                    }
+                }
+
+                $channelName = "DM-" . ($userName ?? $userId ?? $channel['id']);
+            } else {
+                // 通常のチャンネル
+                $channelName = $channel['name'] ?? "Channel-" . $channel['id'];
+            }
+
             $channelModel = Channel::updateOrCreate(
                 ['id' => $channel['id']],
                 [
-                    'workspace_id' => 1, // TODO: 複数ワークスペース対応は将来追加
-                    'name'         => $channel['name']
-                        ?? ($channel['is_im'] ? 'DM-' . ($channel['user'] ?? $channel['id']) : 'Channel-' . $channel['id']),
+                    'workspace_id' => 1,
+                    'name'         => $channelName,
                     'is_private'   => $channel['is_private'] ?? false,
                     'is_dm'        => $channel['is_im'] ?? false,
                     'is_mpim'      => $channel['is_mpim'] ?? false,
@@ -45,27 +82,41 @@ class SlackSync extends Command
                 ]
             );
 
-            // --- 全履歴を取得（ページネーション対応） ---
+            // --- 履歴を取得（user_token 使用） ---
             $cursor = null;
             do {
-                $params = ['channel' => $channel['id'], 'limit' => 200];
-                if ($cursor) $params['cursor'] = $cursor;
+                $params = [
+                    'channel' => $channel['id'],
+                    'limit'   => 200,
+                    'oldest'  => 0, // 全履歴を取得
+                ];
+                if ($cursor) {
+                    $params['cursor'] = $cursor;
+                }
 
-                $history = Http::withToken($token)
+                $history = Http::withToken($userToken)
                     ->get('https://slack.com/api/conversations.history', $params)
                     ->json();
 
-                if (!isset($history['messages'])) {
-                    $this->warn("No messages for {$channel['id']}");
-                    break;
+                // --- エラーハンドリング ---
+                if (($history['ok'] ?? false) === false) {
+                    $error = $history['error'] ?? 'unknown_error';
+
+                    if (in_array($error, ['channel_not_found', 'not_in_channel'])) {
+                        $this->warn("Skip channel {$channel['id']} ({$error})");
+                        continue 2; // このチャンネルはスキップ
+                    }
+
+                    $this->error("Failed to fetch messages for {$channel['id']}: {$error}");
+                    continue 2;
                 }
 
-                foreach ($history['messages'] as $msg) {
+                foreach ($history['messages'] ?? [] as $msg) {
                     $this->storeMessage($channelModel, $msg);
 
                     // --- スレッド返信を取得 ---
-                    if (isset($msg['thread_ts']) && isset($msg['reply_count']) && $msg['reply_count'] > 0) {
-                        $this->fetchReplies($channelModel, $msg['thread_ts']);
+                    if (isset($msg['thread_ts']) && !empty($msg['reply_count'])) {
+                        $this->fetchReplies($channelModel, $msg['thread_ts'], $userToken);
                     }
                 }
 
@@ -74,6 +125,16 @@ class SlackSync extends Command
         }
 
         $this->info('Slack sync completed!');
+
+        // --- 管理者権限を付与 ---
+        $adminEmail = env('ADMIN_EMAIL'); // コメント: .env から管理者メールを取得
+        if ($adminEmail) {
+            \DB::table('users')
+                ->where('email', $adminEmail)
+                ->update(['is_admin' => true]);
+
+            $this->info("Admin権限を {$adminEmail} に付与しました ✅");
+        }
     }
 
     /**
@@ -81,12 +142,24 @@ class SlackSync extends Command
      */
     private function storeMessage(Channel $channelModel, array $msg): void
     {
-        $user = isset($msg['user']) ? User::find($msg['user']) : null;
+        $userId = $msg['user'] ?? null;
+        $user = null;
 
-        // --- type 判定 ---
+        if ($userId) {
+            $user = User::find($userId);
+            if (!$user) {
+                $user = User::create([
+                    'id'       => $userId,
+                    'name'     => 'Unknown User',
+                    'email'    => $userId . '@slack.local',
+                    'is_active' => true,
+                    'is_admin' => false,
+                ]);
+            }
+        }
+
         // --- type 判定 ---
         $type = 'user';
-
         if (!empty($msg['subtype'])) {
             if ($msg['subtype'] === 'bot_message') {
                 $type = 'bot';
@@ -99,6 +172,7 @@ class SlackSync extends Command
             $type = 'system';
         }
 
+        // --- メッセージ保存 ---
         Message::updateOrCreate(
             ['slack_message_id' => (string) $msg['ts']],
             [
@@ -125,13 +199,13 @@ class SlackSync extends Command
                 SlackFile::updateOrCreate(
                     ['slack_file_id' => $f['id']],
                     [
-                        'name'       => $f['name'] ?? null,
-                        'title'      => $f['title'] ?? null,
-                        'mimetype'   => $f['mimetype'] ?? null,
+                        'name'        => $f['name'] ?? null,
+                        'title'       => $f['title'] ?? null,
+                        'mimetype'    => $f['mimetype'] ?? null,
                         'url_private' => $f['url_private'] ?? null,
-                        'channel_id' => $channelModel->id,
-                        'user_id'    => $msg['user'] ?? null,
-                        'message_id' => $msg['ts'],
+                        'channel_id'  => $channelModel->id,
+                        'user_id'     => $user?->id,
+                        'message_id'  => $msg['ts'],
                     ]
                 );
             }
@@ -141,16 +215,20 @@ class SlackSync extends Command
     /**
      * スレッド返信を取得
      */
-    private function fetchReplies(Channel $channelModel, string $threadTs): void
+    private function fetchReplies(Channel $channelModel, string $threadTs, string $userToken): void
     {
-        $token = env('SLACK_USER_TOKEN');
-
         $cursor = null;
         do {
-            $params = ['channel' => $channelModel->id, 'ts' => $threadTs, 'limit' => 200];
-            if ($cursor) $params['cursor'] = $cursor;
+            $params = [
+                'channel' => $channelModel->id,
+                'ts'      => $threadTs,
+                'limit'   => 200,
+            ];
+            if ($cursor) {
+                $params['cursor'] = $cursor;
+            }
 
-            $replies = Http::withToken($token)
+            $replies = Http::withToken($userToken)
                 ->get('https://slack.com/api/conversations.replies', $params)
                 ->json();
 

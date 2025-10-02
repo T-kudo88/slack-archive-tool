@@ -31,7 +31,7 @@ class AuditLog extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($auditLog) {
             $auditLog->created_at = now();
         });
@@ -43,14 +43,6 @@ class AuditLog extends Model
     public function adminUser()
     {
         return $this->belongsTo(User::class, 'admin_user_id');
-    }
-
-    /**
-     * Relationship: AuditLog belongs to accessed user
-     */
-    public function accessedUser()
-    {
-        return $this->belongsTo(User::class, 'accessed_user_id');
     }
 
     /**

@@ -431,14 +431,14 @@ class SyncController extends Controller
     protected function getRecentSyncHistory(): array
     {
         return AuditLog::where('action', 'like', '%sync%')
-            ->with('user')
+            ->with('adminUser')
             ->orderBy('created_at', 'desc')
             ->limit(20)
             ->get()
             ->map(function ($log) {
                 return [
                     'id' => $log->id,
-                    'user_name' => $log->user->name ?? 'システム',
+                    'user_name' => $log->adminUser->name ?? 'システム',
                     'action' => $log->action,
                     'status' => $this->getSyncStatusFromAction($log->action),
                     'created_at' => $log->created_at,

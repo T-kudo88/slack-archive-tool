@@ -1,6 +1,5 @@
 <?php
 
-// database/migrations/xxxx_xx_xx_xxxxxx_add_ts_at_to_messages_table.php
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -10,18 +9,18 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('messages', function (Blueprint $table) {
-            // 生成列（PostgreSQL 12+）: Slack ts を datetime に変換
+            // Slack ts を datetime に変換した列
             $table->timestampTz('ts_at')->nullable()->index();
         });
 
         // 既存データを一括変換
-        // "1745042288.176029" -> to_timestamp(1745042288) + 小数部
+        // "1745042288.176029" -> to_timestamp(1745042288) + 0.176 秒
         DB::statement("
-            UPDATE messages
-            SET ts_at = to_timestamp(split_part(timestamp, '.', 1)::bigint)
-                        + make_interval(msecs => split_part(timestamp, '.', 2)::int/1000)
-            WHERE timestamp IS NOT NULL AND timestamp <> ''
-        ");
+        UPDATE messages
+        SET ts_at = to_timestamp(split_part(timestamp::text, '.', 1)::bigint)
+                    + (('0.' || split_part(timestamp::text, '.', 2))::double precision * interval '1 second')
+        WHERE (timestamp::text) ~ '^[0-9]+(\\.[0-9]+)?$'
+    ");
     }
 
     public function down(): void

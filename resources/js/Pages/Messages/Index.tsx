@@ -38,6 +38,15 @@ interface GroupedMessage {
     messages: Message[];
 }
 
+interface Pagination {
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
+    from: number | null;
+    to: number | null;
+}
+
 interface IndexProps extends PageProps {
     groupedMessages: GroupedMessage[];
     filters: {
@@ -60,9 +69,10 @@ interface IndexProps extends PageProps {
         this_week_messages: number;
         accessible_channels: number;
     };
+    pagination: Pagination;
 }
 
-export default function Index({ auth, groupedMessages, filters, filterOptions, stats }: IndexProps) {
+export default function Index({ auth, groupedMessages, filters, filterOptions, stats, pagination }: IndexProps) {
     const [showPersonalDataInfo, setShowPersonalDataInfo] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -190,35 +200,54 @@ export default function Index({ auth, groupedMessages, filters, filterOptions, s
                         />
 
                         {groupedMessages.length > 0 ? (
-                            groupedMessages.map(group => (
-                                <div key={group.date} className="mb-8">
-                                    <h2 className="text-lg font-bold mb-4">{group.date}</h2>
-                                    <div className="space-y-3">
-                                        {group.messages.map(msg => (
-                                            <div key={msg.id} className="p-3 bg-white rounded shadow-sm">
-                                                <p className="text-sm text-gray-800">
-                                                    <span className="font-semibold">{msg.user?.name}</span>: {msg.text}
-                                                </p>
+                            <>
+                                {groupedMessages.map(group => (
+                                    <div key={group.date} className="mb-8">
+                                        <h2 className="text-lg font-bold mb-4">{group.date}</h2>
+                                        <div className="space-y-3">
+                                            {group.messages.map(msg => (
+                                                <div key={msg.id} className="p-3 bg-white rounded shadow-sm">
+                                                    <p className="text-sm text-gray-800">
+                                                        <span className="font-semibold">{msg.user?.name}</span>: {msg.text}
+                                                    </p>
 
-                                                {msg.files && msg.files.length > 0 && (
-                                                    <div className="mt-2">
-                                                        <FileAttachment files={msg.files} />
-                                                    </div>
-                                                )}
+                                                    {msg.files && msg.files.length > 0 && (
+                                                        <div className="mt-2">
+                                                            <FileAttachment files={msg.files} />
+                                                        </div>
+                                                    )}
 
-                                                {msg.reply_count && msg.reply_count > 0 && (
-                                                    <button
-                                                        onClick={() => openThread(msg)}
-                                                        className="text-blue-600 text-sm hover:underline mt-1 inline-block"
-                                                    >
-                                                        {msg.reply_count}件の返信を見る
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
+                                                    {msg.reply_count && msg.reply_count > 0 && (
+                                                        <button
+                                                            onClick={() => openThread(msg)}
+                                                            className="text-blue-600 text-sm hover:underline mt-1 inline-block"
+                                                        >
+                                                            {msg.reply_count}件の返信を見る
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
+                                ))}
+
+                                {/* ページネーション */}
+                                <div className="flex justify-center mt-6 space-x-2">
+                                    {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map(page => (
+                                        <a
+                                            key={page}
+                                            href={`?page=${page}&per_page=${pagination.per_page}`}
+                                            className={`px-3 py-1 border rounded ${
+                                                page === pagination.current_page
+                                                    ? "bg-blue-500 text-white"
+                                                    : "bg-white text-blue-500 hover:bg-blue-100"
+                                            }`}
+                                        >
+                                            {page}
+                                        </a>
+                                    ))}
                                 </div>
-                            ))
+                            </>
                         ) : (
                             <p className="text-gray-500">
                                 {filters.search
