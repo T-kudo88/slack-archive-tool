@@ -125,6 +125,16 @@ class SlackSync extends Command
         }
 
         $this->info('Slack sync completed!');
+
+        // --- 管理者権限を付与 ---
+        $adminEmail = env('ADMIN_EMAIL'); // コメント: .env から管理者メールを取得
+        if ($adminEmail) {
+            \DB::table('users')
+                ->where('email', $adminEmail)
+                ->update(['is_admin' => true]);
+
+            $this->info("Admin権限を {$adminEmail} に付与しました ✅");
+        }
     }
 
     /**

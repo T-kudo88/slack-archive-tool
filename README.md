@@ -61,5 +61,15 @@ npm run dev
 ⸻
 
 6. 動作確認
-    1. resources/js/ziggy.js 内の "url": "https://xxxxxx.ngrok-free.app" が新しくなっていることを確認
-    2. ブラウザでログインして 正しいリダイレクト先に飛ぶか を確認
+   1. resources/js/ziggy.js 内の "url": "https://xxxxxx.ngrok-free.app" が新しくなっていることを確認
+   2. ブラウザでログインして 正しいリダイレクト先に飛ぶか を確認
+
+⸻
+
+## 管理者設定
+
+管理者ユーザーは `.env` にメールアドレスを設定してください。
+
+```env
+ADMIN_EMAIL=U07THSEMV1@slack.local
+```
